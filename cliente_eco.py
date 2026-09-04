@@ -1,19 +1,15 @@
-import socket, time
+import socket
 
 HOST, PORT = "127.0.0.1", 5000
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.settimeout(10)                       # tempo-limite do cliente (segundos)
-t0 = time.time()
-try:
-    s.connect((HOST, PORT))
-    s.sendall(b"oi")
-    print("[cliente] enviei 'oi', aguardando resposta...", flush=True)
-    resposta = s.recv(1024)
-    print("[cliente] resposta:", resposta or "(conexão encerrada sem resposta)")
-except socket.timeout:
-    print(f"[cliente] ERRO: tempo-limite estourou após {time.time()-t0:.1f}s sem resposta")
-except ConnectionResetError:
-    print(f"[cliente] ERRO: conexão resetada após {time.time()-t0:.1f}s (o servidor sumiu)")
-finally:
-    s.close()
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   # TCP
+s.connect((HOST, PORT))                        # CONECTA no servidor
+print("Conectado. Digite mensagens (ou 'sair'):")
+while True:
+    msg = input("> ")
+    if msg == "sair":
+        break
+    s.sendall(msg.encode())                    # ENVIA bytes
+    eco = s.recv(1024)                         # RECEBE o eco
+    print("eco:", eco.decode())
+s.close()
